@@ -183,12 +183,61 @@ We often use \textbf{scaled dot-product attention} in practice. The short matrix
 
 \subsection{Multi-headed Attention}
 
-Multiple attention "heads" can detect different types of relationships/patterns. They use different attention weights:
+Multiple attention "heads" can detect different types of relationships/patterns. The outputs of these heads are then combined, allowing the model to capture richer patterns than a single attention mechanism. They use different attention weights:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.55\linewidth]{images/mhattn.png}
 \end{figure}
+
+Because projections are different, each head can focus on different positions, capture different types of dependencies, and specialize. Outputs are concatenated and projected with a matrix $W_o$to get the final output. This is similar to channels in CNNs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\linewidth]{images/mhattn2.png}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/mha-diagram.png}
+    \caption{Multi-head attention. Multiple attention heads learn different relationships in parallel, and their outputs are combined to form a richer representation.}
+\end{figure}
+
+\subsection{Tokenization and embedding}
+
+Before a model can process text, it must convert it into a numerical form. This is done in two steps: first, the text is split into tokens using a tokenization algorithm, and then each token is mapped to a vector through an embedding. This allows the model to work with discrete language inputs using continuous representations.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/tokenization.png}
+    \caption{Tokenization. Text is split into discrete units.}
+\end{figure}
+
+\textbf{Vocabulary} consists of all possible tokens, usually including a special $<unknown>$ token for unknown words. Each token becomes a vector of length $|\text{vocabulary}|$ assuming \textbf{one-hot encoding}: one entry is 1 and the rest are 0.
+
+We map tokens to dense vectors using an embedding matrix: $x_t \leftarrow W_{\text{embed}}\;x_t$
+
+Self-attention treats inputs as a set and does not encode the order of elements. TO allow the model to reason about sequences, we inject positional information into the input with positional encodings, which provide each token with information about its position in the sequence.
+
+\begin{itemize}
+    \item \textbf{Idea 1:} Raw position. Just append the index $t$, $x_t \leftarrow \begin{bmatrix} | \\ x_t \\ | \\ t \end{bmatrix}$. Simple but not very expressive.
+    \item \textbf{Idea 2:} Binary encoding. Represent the position in binary, different bits capture different scales 
+
+    $x_2 \leftarrow \begin{bmatrix} | \\ x_2 \\ | \\ 0 \\ 1 \\ 0 \end{bmatrix}$, $x_{3} \leftarrow \begin{bmatrix} | \\ x_{3} \\ | \\ 0 \\ 1 \\ 0 \end{bmatrix}$.
+
+    \item \textbf{Idea 3:} Sinusoidal encoding. Use sine and cosine functions of different frequencies to encode positions, allowing the model to learn relative positions and generalize to longer sequences.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/sinusoidal.png}
+    \caption{Positional Encoding (PoE).Different frequencies encode position, enabling the model to recover sequence order.}
+\end{figure}
+
+Sinusoidal positional encoding is preferred over binary because it gives positions a smooth, structured representation that reflects both order and distance. Nearby positions get similar vectors, and shifts in position create predictable changes, which helps models learn relative relationships between tokens. Binary encoding changes abruptly and does not preserve positional closeness, so positions that are numerically close can look very different. Sinusoidal encoding is the one actually used in transformers.
+
+\section{Transformers}
+
 
 
 \end{document}
