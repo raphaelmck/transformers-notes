@@ -1,4 +1,4 @@
-% !TEX root = ./13-transformers.tex
+% !TEX root = ./w26-L13-transformers.tex
 \documentclass{article}
 \usepackage[a4paper,margin=1in]{geometry}
 \usepackage{calc}
@@ -120,7 +120,7 @@ When generating each output word, the model should focus on different input word
     \label{fig:seq2seq-with-attention}
 \end{figure}
 
-Attention replaces the fixed context vector with a dynamic one that is recomputed at each decoding step. Instead of relying on a single summary, the decoder selectively focuses on different encoder states depending on what it is generating. This allows the model to align input and output elements and capture long-range dependencies more effectively.
+\noindent Attention replaces the fixed context vector with a dynamic one that is recomputed at each decoding step. Instead of relying on a single summary, the decoder selectively focuses on different encoder states depending on what it is generating. This allows the model to align input and output elements and capture long-range dependencies more effectively.
 
 At each decoding step, we compute a context vector:
 
@@ -145,6 +145,50 @@ We compare the current decoder hidden state $h_t^d$ with each encoder hidden sta
 \end{figure}
 
 \subsection{Self-Attention}
+
+Self-attention layer is the core building block in transformers. Given an input set/sequence of vectors, we now generate an output sequence/set of vectors.
+
+Given input $x_1, \dots, x_T$, we compute query $q_t = W_q x_t$, key $k_t = W_k x_t$, and value $v_t = W_v x_t$ value for each. We then generate each outputs $y_1, \dots, y_T$ using the attention mechanism:
+
+\[ y_t = \text{Attn}(q_t, (k_1, v_1), \dots, (k_T, v_T)) \]
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/degrees.png}
+    \caption{Self attention in transformers. The same word "it" can attend to different words. Each output, pays attention to each input to varying degree we can learn the weights to pay attention to what is relevant for each outpur}
+    \label{fig:degreess}
+\end{figure}
+
+We can use \textbf{dot product attention} for the entire input:
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/cdot.png}
+\end{figure}
+
+Each row sums to one. Each row of the attention matrix gives a linear combination of rows of $V$. We can use an \textbf{attention mask} to prevent some outputs from attenting parts of input. For example a \textbf{causal mask} prevents looking into the future in sequence generation.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/mask.png}
+    \caption{Attention mask. We can optionally multiply the attention matrix by a mask matrix so that predictions don't look into the future}
+\end{figure}
+
+We often use \textbf{scaled dot-product attention} in practice. The short matrix form of self-attention:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{images/self-attention-matrix-form.png}
+\end{figure}
+
+\subsection{Multi-headed Attention}
+
+Multiple attention "heads" can detect different types of relationships/patterns. They use different attention weights:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\linewidth]{images/mhattn.png}
+\end{figure}
 
 
 \end{document}
