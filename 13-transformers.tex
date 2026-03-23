@@ -6,6 +6,11 @@
 \usepackage{polynom}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx} 
+\usepackage{xcolor}
+\usepackage{float}
+
+\definecolor{lightblue}{RGB}{100,149,237}
+\newcommand{\dimlabel}[2]{\underset{\color{lightblue}{#2\strut}}{#1}}
 
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.55em}
@@ -76,6 +81,43 @@ First compare the query $q$ with each key $k_t$ using a scoring function, then a
     \includegraphics[width=0.6\linewidth]{images/attention_mechanism_diagram.png}
     \caption{Diagram of the attention mechanism. The query is compared with all keys to produce attention weights, which are then used to form a weighted sum of the value vectors.}
     \label{fig:attention_mechanism_diagram}
+\end{figure}
+
+\noindent There are many choices for the scoring function $a(q, k)$. The simplest is \textbf{dot-product attention:} $a(q, k) = q^T \cdot k$, assuming $q, k \in \mathbb{R}^D$. A common improvement is \textbf{scaled dot-product attention:} $\frac{q^T \cdot k}{\sqrt{D}}$, which doesn't scale with $D$. Another option is \textbf{additive attention:} $a(q, k) = w^T \cdot \tanh(W_q q + W_k k)$.
+
+If all inputs are stacked into a matrix $X$, we can compute keys and values as 
+
+\[
+\dimlabel{K}{T \times D_k}
+=
+\dimlabel{X}{T \times D}
+\dimlabel{W_k}{D \times D_k}
+\quad\quad
+\dimlabel{V}{T \times D_v}
+=
+\dimlabel{X}{T \times D}
+\dimlabel{W_v}{D \times D_v}
+\]
+
+\[ \text{Attn}(q, K, V) = \mathcal{S}\dimlabel{(qK^T)V}{D_v}\]
+
+\noindent \textbf{Example: SeqToSeq with Attention:} Recall that the the context vector in encoder-decoder RNN is a "bottleneck", as all information must pass through one vector and long-range dependencies are hard to preserve. In tasks like translation, different output words depend on different parts of the input.
+
+When generating each output word, the model should focus on different input words. Without attention, it cannot do this explicitly.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/seq2seq-nn.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/seq2seq-with-attention.png}
+    \end{minipage}
+    \caption{Neural Machine Translation without and with attention. The left diagram shows a standard encoder-decoder architecture where the encoder produces a single context vector that the decoder uses to generate the output sequence. The right diagram shows how attention allows the decoder to focus on different parts of the input sequence when generating each output word, improving performance}
+    \label{fig:two-images}
 \end{figure}
 
 \end{document}
