@@ -112,12 +112,39 @@ When generating each output word, the model should focus on different input word
         \includegraphics[width=\linewidth]{images/seq2seq-nn.png}
     \end{minipage}
     \hfill
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}{0.40\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/seq2seq-with-attention.png}
     \end{minipage}
     \caption{Neural Machine Translation without and with attention. The left diagram shows a standard encoder-decoder architecture where the encoder produces a single context vector that the decoder uses to generate the output sequence. The right diagram shows how attention allows the decoder to focus on different parts of the input sequence when generating each output word, improving performance}
-    \label{fig:two-images}
+    \label{fig:seq2seq-with-attention}
 \end{figure}
+
+Attention replaces the fixed context vector with a dynamic one that is recomputed at each decoding step. Instead of relying on a single summary, the decoder selectively focuses on different encoder states depending on what it is generating. This allows the model to align input and output elements and capture long-range dependencies more effectively.
+
+At each decoding step, we compute a context vector:
+
+\[ c_t = \sum_{i=1}^T \alpha_i (h_t^d, h_i^e)h_i^e \]
+
+We compare the current decoder hidden state $h_t^d$ with each encoder hidden state $h_i^e$ to get attention weights $\alpha_i$. Then take a weighted sum of encoder states. The output depends on the decoder state and the context vector, the model is effectively "looking back" at the input each time it generates a word.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/heatmap.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/seq2seq-attention-detailed.png}
+    \end{minipage}
+    \caption{Attention heatmap and output. The heatmap shows which input words are used for each output word. At each step, the decoder computes a context vector by attending to all encoder states. This reveals an alignment between source and target sequences.}
+	
+    \label{fig:heatmap-and-output}
+\end{figure}
+
+\subsection{Self-Attention}
+
 
 \end{document}
