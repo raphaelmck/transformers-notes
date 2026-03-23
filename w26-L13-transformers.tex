@@ -238,6 +238,77 @@ Sinusoidal positional encoding is preferred over binary because it gives positio
 
 \section{Transformers}
 
+The Transformer combines the ideas introduced so far into a single architecture for processing sequences. Input tokens are first converted into embeddings and enriched with positional information, then passed through a stack of identical blocks. Each block uses multi-head self-attention to exchange information across the sequence and a feedforward network to further transform each position, with residual connections and layer normalization helping optimization and stability.
 
+\subsection{Architecture}
+
+Inside one block, we first have multi-head self-attention, each position can attend to all other psotions, this lets information flow across the whole sequence. Then comes a feedforward network, which is applied independently to each position, allowing for complex transformations. Around both sublayers we use residual connections which add the input back to the output, and layer normalization which keeps activations well-scaled. These make deep transformers easier to train.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/code.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/transformer.png}
+    \end{minipage}
+    \caption{A Transformer alternates sequence-wide information mixing through self-attention with position-wise processing through feedforward layers, repeated across multiple blocks.}
+	
+\end{figure}
+
+\subsection{Bidirectional Encoder Representations from Transformers (BERT)}
+
+BERT is a Transformer-based model that learns contextual word representations using a bidirectional encoder. Unlike generative models, it is trained to understand text by looking at both left and right context simultaneously. This is achieved through pretraining objectives that encourage the model to recover missing information and understand relationships between sentences.
+
+\textbf{Pretraining Objectives:} Masked Language Modeling (MLM) randomly masks some input tokens and trains the model to predict them based on the surrounding context forcing the model to understand context deeply.
+
+Next Sentence Prediction (NSP) trains the model to determine if two sentences are consecutive in the original text, helping it learn relationships between sentences.
+
+The model is pretrained on a large dataset with these objectives. It learns general-purpose language representations.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.35\linewidth]{images/bert1.png}
+    \caption{BERT uses a bidirectional Transformer encoder trained with masked token prediction and sentence-level objectives.}
+\end{figure}
+
+After pretraining, BERT can be adapted (fine-tuned) to many downstream tasks by adding a small task-specific layer and fine-tuning the entire model. This allows it to leverage its learned representations with relatively little labeled data.
+
+\textbf{Finetuning:} Start from pretrained BERT and add a small task-specific head (e.g., classifier). Train on labeled data for the target task, this usually requires much less data than training from scratch. Pretraining learns syntax, semantics, contextual relationships, and finetuning specializes these representations.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\linewidth]{images/bert2.png}
+    \caption{The same pretrained BERT model can be adapted to different tasks by adding simple task-specific heads: Sentence classification, token level tasks, question answering}
+\end{figure}
+
+\subsection{Generative Pretrained Transformer (GPT)}
+
+GPT is a Transformer-based model designed for text generation. Unlike BERT, it uses a decoder architecture with causal masking, meaning each token can only attend to previous tokens. It is trained to predict the next token in a sequence, allowing it to generate text autoregressively.
+
+Training objective: Given tokens $x_1, \dots, x_{t-1}$, train the model to predict $x_t$. Training in parallel is possible by using a causal mask to prevent looking at future tokens: input $x_1, x_2, \dots, x_T$, targets $x_2, x_3, \dots, x_{T+1}$ This is just a shifted vesion of the input, and the model learns to predict the next token based on all previous tokens, similar to sequence modeling with RNNs but without the sequential bottleneck.
+
+The model learns: grammar, structure, and long-range dependencies. By predicting the next token, it implicitly models the full sequence distribution.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.35\linewidth]{images/gpt.png}
+    \caption{GPT uses a Transformer decoder with causal masking to predict the next token based on previous ones.}
+\end{figure}
+
+At inference: generate one token at a time, append it to the sequence, and repeat. This allows for flexible generation of text of arbitrary length. The model can generate coherent paragraphs, answer questions, or even write code by leveraging its learned language understanding. BERT reads the whole sentence to understand it; GPT reads left-to-right to generate it.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/comparison.png}
+    \caption{Self-attention enables direct connections between all tokens, reducing dependency path length and enabling parallel computation.}
+\end{figure}
+
+Different neural architectures capture dependencies in sequence data using different inductive biases. Convolutional networks focus on local patterns, recurrent networks process sequences step by step, and Transformers use self-attention to directly connect all elements. These differences lead to trade-offs in computational cost, parallelization, and how easily long-range dependencies can be modeled.
+
+\textbf{Optional:} The lecture slides contain some optional material on BERT and GPT, mostly diagrams and examples.
 
 \end{document}
